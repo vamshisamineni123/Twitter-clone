@@ -1,0 +1,93 @@
+// This is your Prisma schema file.
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String          @id @default(uuid())
+  username         String          @unique     
+  name             String          
+  avatar           String?          @default("")
+  bio              String?          @default("")
+  follower_count   Int           @default(0)
+  following_count  Int           @default(0)
+  verified         Boolean          @default(false)
+  posts            Post[]          @relation("userpost")
+  followers        UserFollowing[] @relation("Followers")
+  following        UserFollowing[] @relation("Following")
+  mentions         Mention[]
+  likes            Like[]
+}
+
+model Image {
+  id       String @id @default(uuid())
+  url      String
+  post     Post   @relation(fields: [post_id], references: [id])
+  post_id  String
+}
+model Like {
+  id       String  @id @default(uuid())
+  post     Post    @relation(fields: [post_id], references: [id])
+  post_id  String
+  user     User    @relation(fields: [user_id], references: [id])
+  user_id  String
+}
+
+
+
+model UserFollowing {
+  id           String  @id @default(uuid())
+  follower    User    @relation("Followers", fields: [follower_id], references: [id])
+  follower_id String
+  followee    User    @relation("Following", fields: [followee_id], references: [id])
+  followee_id String
+}
+
+model Mention {
+  id       String  @id @default(uuid())
+  name     String
+  user     User    @relation(fields: [user_id], references: [id])
+  user_id  String
+  post     Post    @relation(fields: [post_id], references: [id])
+  post_id  String
+}
+model Post {
+  id            String   @id @default(uuid())
+  text          String   
+  author        User     @relation("userpost", fields: [author_id], references: [id])
+  author_id     String            
+  images        Image[]
+  like_count    Int           @default(0)
+  repost_count  Int           @default(0)
+  // orig_post     Post?    @relation("OrigPost", fields: [orig_post_id], references: [id])
+  // orig_post_id  String?  @default("null")
+  // reply_to      Post?    @relation("ReplyTo", fields: [reply_to_id], references: [id])
+  // reply_to_id   String?   @default("null")
+  mentions      Mention[]
+  hashtags       Hashtag[] @relation("hashtags")
+  hashtagpost   HashtagPost? @relation("hashtags2")
+  likes         Like[]
+//   reposts       Post[]          @relation("OrigPost")
+//   replies       Post[]          @relation("ReplyTo")
+}
+model Hashtag {
+  id                 String          @id @default(uuid())
+  tag                String          @unique
+  recent_post_count  BigInt          @default(0)
+  posts             HashtagPost[] @relation("hashtags1")
+  hashtags           Post[]          @relation("hashtags")
+  //  postsInPosts       Post[]          @relation("hashtags")
+}
+model HashtagPost {
+  id         String   @id @default(uuid())
+  hashtag    Hashtag  @relation("hashtags1",fields: [hashtag_id], references: [id])
+  hashtag_id String
+  post       Post     @relation("hashtags2",fields: [post_id], references: [id])
+  post_id    String       @unique
+}
