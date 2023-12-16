@@ -14,7 +14,7 @@ export class PostsController {
     data: {
       // id: string;
       text: string;
-      author_id: string;
+       author_id: string;
       images?: string;
       like_count?: number;
       repost_count?: number;
@@ -26,12 +26,18 @@ export class PostsController {
     const post = await this.postservice.createPost(data);
     return post;
   }
-  //2 2 3 (2,3)
 
   @Get('/')
   getPosts(): Promise<PostModel[]> {
     return this.postservice.getPosts();
    // return 'all the posts';
+  }
+
+
+
+  @Get('/:id')
+  getPostsByAuthorId(@Param('id') author_id: string): Promise<PostModel[]> {
+    return this.postservice.getPostsByAuthorId(author_id);
   }
 
   // @Get('/:postid')
@@ -63,7 +69,6 @@ export class PostsController {
   likePost(@Param('postid') postid:string): any {
     const like=this.postservice.increaseLikeCount(postid);
     return like;
-   // return 'post liked';
   }
   @Delete('/:postid/:userid/like')
   unlikePost(@Param('postid') postid:string,

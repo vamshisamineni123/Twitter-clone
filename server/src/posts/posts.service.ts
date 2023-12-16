@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Post,Like, Prisma  } from '@prisma/client';
+import { Post, Like, Prisma } from '@prisma/client';
 import { Client } from 'pg';
 @Injectable()
 export class PostService {
@@ -15,7 +15,7 @@ export class PostService {
   async createPost(data1: {
     // id: string;
     text: string;
-    author_id: string;
+   author_id: string;
     images?: string;
     like_count?: number;
     repost_count?: number;
@@ -23,7 +23,7 @@ export class PostService {
     // reply_to_id?: string;
   }): Promise<any> {
     const query = `
-      INSERT INTO posts (id,text, author_id, images, like_count, repost_count)
+      INSERT INTO posts (id,text,author_id,images, like_count, repost_count)
       VALUES (uuid_generate_v4(),$1, $2, $3, $4,$5)
       RETURNING *
     `;
@@ -37,7 +37,7 @@ export class PostService {
     ];
     const result = await this.client.query(query, values);
     return result.rows[0];
-    
+
   }
 
 
@@ -51,7 +51,7 @@ export class PostService {
     const values = [postId];
     const result = await this.client.query(query, values);
     return result.rows[0];
-}
+  }
 
 
   // async createPost(data1: {
@@ -74,13 +74,36 @@ export class PostService {
   //   });
   //   return post;
   // }
-   
+
   // async getPosts(): Promise<Post[]> {
   //   const posts = await this.prisma.post.findMany({include:{author:true}});
   //   return posts;
   // }
 
-  async  getPosts() {
+  async getPostsByAuthorId(authorId: string): Promise<Post[]> {
+    const query = `
+        SELECT * FROM posts WHERE author_id = $1
+    `;
+
+    try {
+      const result = await this.client.query(query, [authorId]);
+      console.log(result)
+      const posts = result.rows;
+      console.log(posts)
+      // If no posts are found, return an empty array
+      if (!posts) {
+        return [];
+      }
+
+      // If posts are found, return the posts
+      return posts;
+    } catch (error) {
+      console.error('Error executing SQL query:', error);
+      throw error;
+    }
+  }
+
+  async getPosts() {
     const res = await this.client.query('SELECT * FROM posts');
     return res.rows;
   }
@@ -103,18 +126,18 @@ export class PostService {
         user: { connect: { id: userId } },
       },
     });
-  
+
     return like;
   }
 
   async unlikePost(postId: string, userId: string): Promise<void> {
-  await this.prisma.like.deleteMany({
-    where: {
-      post: { id: postId },
-      user: { id: userId },
-    },
-  });
-}
+    await this.prisma.like.deleteMany({
+      where: {
+        post: { id: postId },
+        user: { id: userId },
+      },
+    });
+  }
 
 }
 

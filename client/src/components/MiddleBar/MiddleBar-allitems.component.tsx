@@ -9,7 +9,7 @@ import { setPosts } from '../../store/Postsreducer.slice';
 import userId from '../../hooks/userId.hook';
 // import  {store}  from '../../store/index.slice'
 
-const MyComponent = () => {
+const MiddleBarallitems = () => {
     // const [posts, setPosts] = useState<Post[]>([]);
     const dispatch = useDispatch();
     const posts:any=useSelector((state:RootState)=>state.posts.posts)
@@ -21,12 +21,11 @@ const MyComponent = () => {
     const id=user?.id;
     useEffect(() => {
         
-            fetch(`http://localhost:3002/posts?id=${id}`)
+            fetch(`http://localhost:3002/posts`)
                 .then(response => response.json())
                 .then(data => {
-                    const filteredPosts = data.filter((post: Post) => post.author_id === id);
+                    const filteredPosts = data;
                     localStorage.setItem('posts', JSON.stringify(filteredPosts));
-                    console.log("filteredPosts", filteredPosts)
                     dispatch(setPosts(filteredPosts));
                 });
     }, [id]);
@@ -37,7 +36,7 @@ const MyComponent = () => {
               {/* <CreateTweet /> */}
                {
                     posts.slice(-10).reverse().map((post:any, index:any) => (
-                        <div>
+                        <div key={post.id}>
                             <Tweet key={post.id} post={post} />
                         </div>
                     ))
@@ -47,6 +46,6 @@ const MyComponent = () => {
     );
 };
 
-export default MyComponent;
+export default MiddleBarallitems;
 
 

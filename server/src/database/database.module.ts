@@ -10,6 +10,7 @@ export class MainModule implements OnModuleInit
   constructor(private readonly databaseSetupService: DatabaseSetupService) {}
 
   async onModuleInit() {
-    await this.databaseSetupService.createTables();
+     await this.databaseSetupService.createTables();
+   
   }
 }

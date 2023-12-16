@@ -33,10 +33,12 @@ export class UserService {
     follower_count?: number;
     following_count?: number;
     verified?: boolean;
+    email: string;
+    password: string;
   }): Promise<User> {
     const query = `
-      INSERT INTO users (id,username, name, avatar, bio, follower_count, following_count, verified)
-      VALUES (uuid_generate_v4(),$1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO users (id,username, name, avatar, bio, follower_count, following_count, verified,email,password)
+      VALUES (uuid_generate_v4(),$1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `;
     const values = [
@@ -48,6 +50,8 @@ export class UserService {
       data.follower_count ?? 0,
       data.following_count ?? 0,
       data.verified ?? false,
+      data.email,
+      data.password
     ];
     console.log(values)
     // if (!data.id) {
@@ -94,6 +98,30 @@ export class UserService {
   //     throw new InternalServerErrorException('Error retrieving user by username');
   //   }
   // }
+
+  async getUserByEmail(email: any): Promise<User | null> {
+    const query = `
+        SELECT * FROM users WHERE email = $1
+    `;
+   
+    try {
+        const result = await this.client.query(query, [email]);
+        const user = result.rows[0];
+        // If user doesn't exist, return null
+        if (!user) {
+          // console.log('user is null call from service');
+            return null;
+        }
+        //  console.log('user is not null call from service')
+        // If user exists, return the user
+        return user;
+    } catch (error) {
+        console.error('Error executing SQL query:', error);
+        throw error;
+    }
+}
+
+
   async getById(userid: string): Promise<any> {
     const query = `
       SELECT *
@@ -176,6 +204,48 @@ try {
 return null;
 }
 
+
+async createFollowing(followerId: string, followeeId: string): Promise<void> {
+  const createFollowingSQL = `
+    INSERT INTO follows (follower_id, followee_id)
+    VALUES ($1, $2)
+  `;
+
+ const res= await this.client.query(createFollowingSQL, [followerId, followeeId]);
+ return res;
+}
+
+
+async getFollowers(userId: string): Promise<any> {
+  const getFollowersSQL = `
+    SELECT *
+    FROM follows
+    WHERE followee_id = $1
+  `;
+
+  const { rows } = await this.client.query(getFollowersSQL, [userId]);
+  return rows;
+}
+
+async getFollowees(userId: string): Promise<any> {
+  const getFolloweesSQL = `
+    SELECT *
+    FROM follows
+    WHERE follower_id = $1
+  `;
+
+  const { rows } = await this.client.query(getFolloweesSQL, [userId]);
+  return rows;
+}
+async unfollowUser(followerId: string, followeeId: string): Promise<void> {
+
+  const query = `
+    DELETE FROM follows
+    WHERE follower_id = $1 AND followee_id = $2
+  `;
+  const values = [followerId, followeeId];
+  await this.client.query(query, values);
+}
 // async create(data:{
 //   username: string;
 //   name: string;

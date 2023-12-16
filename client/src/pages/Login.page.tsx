@@ -1,54 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setUsername, setPassword, setRam } from '../store/Postsreducer.slice';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { login } from '../store/loginreducer.slice';
 
 
 
 const Login: React.FC<{}> = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [inputUsername, setInputUsername] = useState('');
+    const [inputEmail, setInputEmail] = useState('');
     const [inputPassword, setInputPassword] = useState('');
 
     const u = useSelector((state: any) => state.posts.username);
     const p = useSelector((state: any) => state.posts.password);
 
-    // useEffect(() => {
-    //     const storedUser = localStorage.getItem('user');
-    //     console.log(storedUser)
-    //     if (storedUser) {
-    //       const userData = JSON.parse(storedUser);
-    //       console.log(userData);
-    //       dispatch(setRam(true));
-    //       localStorage.setItem('user', JSON.stringify(userData));
-    //     }
-    //   }, [dispatch]);
-
-
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-       
+
         try {
             const response = await fetch('http://localhost:3002/users/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: inputUsername, password: inputPassword })
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: inputEmail, password: inputPassword })
             });
-           console.log(response);
+            console.log(response);
             if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-    
+
             const data = await response.json();
-            console.log(data);
-            localStorage.setItem('user', 'true');
-            dispatch(setRam(true));
+
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('email', inputEmail);
+            localStorage.setItem('password', inputPassword);
+            dispatch(login({ email: inputEmail, password: inputPassword }))
+
             navigate('/');
-          } catch (error) {
+        } catch (error) {
             console.error('invalid credentails');
-          }
-        setInputUsername('');
+        }
+        setInputEmail('');
         setInputPassword('');
     };
 
@@ -65,8 +57,8 @@ const Login: React.FC<{}> = () => {
                             name="username"
                             className="form-input"
                             placeholder="e.g., yourusername"
-                            value={inputUsername}
-                            onChange={e => setInputUsername(e.target.value)}
+                            value={inputEmail}
+                            onChange={e => setInputEmail(e.target.value)}
                         />
                     </div>
                     <div>
@@ -85,7 +77,7 @@ const Login: React.FC<{}> = () => {
                         <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-500">Log In</button>
                     </div>
                     <div>
-                        <p className="text-center">Don't have an account? <a href="/signup" className="text-blue-500 hover:underline">Sign up</a></p>
+                        <p className="text-center">Don't have an account? <Link to="/signup" className="text-blue-500 hover:underline">Sign up</Link></p>
                     </div>
                 </form>
             </div>

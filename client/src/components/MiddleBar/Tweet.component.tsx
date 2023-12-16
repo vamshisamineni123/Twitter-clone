@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import MessageIcon from '@mui/icons-material/Message';
 import ReplayIcon from '@mui/icons-material/Replay';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -13,7 +13,7 @@ const Tweet = ({ post }) => {
     const [isLiked, setIsLiked] = useState(false);
     const handleLike = () => {
         setIsLiked(!isLiked);
-      };
+    };
     // const [tweet, setTweet] = React.useState(post);
     // const tweet=useSelector((state :RootState)=>state.posts.posts)
     // console.log('tweet bugga ',tweet);
@@ -70,7 +70,7 @@ const Tweet = ({ post }) => {
                         {post.like_count}
                     </div>
                     <div className='text-gray-300 text-xs'>
-                    <button onClick={handleLike}>Likes</button>
+                        <button onClick={handleLike}>Likes</button>
                     </div>
                 </div>
                 <div className='flex mr-2'>
@@ -103,7 +103,7 @@ const Tweet = ({ post }) => {
                     </div>
                 </div>
                 <div className='flex mr-16'>
-                <div className={`text-xs ${isLiked ? 'text-red-500' : 'text-gray-300'}`}>
+                    <div className={`text-xs ${isLiked ? 'text-red-500' : 'text-gray-300'}`}>
                         <FavoriteBorderIcon />
                     </div>
                     <div className='text-sm'>

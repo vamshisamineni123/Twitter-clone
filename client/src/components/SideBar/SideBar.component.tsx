@@ -8,6 +8,7 @@ import SidebarTweetButton from './SideBarTweetButton.component';
 import { useNavigate } from 'react-router-dom';
 import { setRam } from '../../store/Postsreducer.slice';
 import { useDispatch } from 'react-redux';
+import { logout } from '../../store/loginreducer.slice';
 
 const SideBar = () => {
     const navigate = useNavigate();
@@ -37,8 +38,10 @@ const SideBar = () => {
         },
     ];
     const handleLogOut=()=>{
-      localStorage.setItem('user', 'false');
-        dispatch(setRam(false));
+      localStorage.setItem('isAuthenticated', 'false');
+      localStorage.setItem('email', '');
+      localStorage.setItem('password', '');
+        dispatch(logout());
         navigate('/login');
     }
 

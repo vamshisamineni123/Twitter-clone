@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { setPosts } from '../../store/Postsreducer.slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/index.slice';
-
+import userId from '../../hooks/userId.hook';
 
 const CreateTweet = () => {
   const fileInput = useRef<HTMLInputElement>(null);
@@ -13,46 +13,56 @@ const CreateTweet = () => {
   const [TweetText, setTweetText] = useState<string>('');
   const dispatch = useDispatch();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const focusTextarea = useSelector((state:RootState) => state.posts.textareafocus);
+  const focusTextarea = useSelector((state: RootState) => state.posts.textareafocus);
   const posts = useSelector((state: RootState) => state.posts.posts);
+
+  const email=localStorage.getItem('email');
+
+    const user=userId(email===null?'':email);
+    const id=user?.id;
   const handleImageClick = () => {
     if (fileInput.current) {
       fileInput.current.click();
     }
   };
-   // replace with rereelector
+  // replace with rereelector
 
-useEffect(() => {
-  if (focusTextarea && textAreaRef.current) {
-    textAreaRef.current.focus();
-  }
-}, [focusTextarea]);
+  useEffect(() => {
+    if (focusTextarea && textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+  }, [focusTextarea]);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTweetText(event.target.value);
   };
-
+      
   const handleTweet = async () => {
-    const tweetData = {
-      text: TweetText,
-      author_id: "bd6684ae-abb9-4555-833a-c7da174b15ed",
-      images: [image ? URL.createObjectURL(image) : "ram here"], // Assuming 'image' is the URL of the image
-    };
-
-    const response = await fetch('http://localhost:3002/posts/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(tweetData),
-    });
-    if (response.ok) {
-      const newPost = await response.json();
-      dispatch(setPosts([...posts, newPost]));
-      TweetText && setTweetText('');
-      image && setImage(null);
+    if (TweetText !== null && TweetText.trim() !== '') {
+      const tweetData = {
+        text: TweetText,
+         author_id: id,
+        images: [image ? URL.createObjectURL(image) : "ram here"], // Assuming 'image' is the URL of the image
+      };
+  
+      const response = await fetch('http://localhost:3002/posts/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tweetData),
+      });
+      console.log('response ', response)
+      if (response.ok) {
+        const newPost = await response.json();
+        dispatch(setPosts([...posts, newPost]));
+        setTweetText('');
+        image && setImage(null);
+      } else {
+        console.error('Error posting tweet:', response);
+      }
     } else {
-      console.error('Error posting tweet:', response);
+      alert('Please enter some text');
     }
   };
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,14 +94,14 @@ useEffect(() => {
   };
 
   return (
-    <div className='flex-col h-1/4 border border-gray-300 p-4 rounded-3xl m-3 bg-white'>
+    <div className='flex-col border border-gray-300 p-4 rounded-3xl m-3 bg-white'>
       <div>Tweet something</div>
       <div className="border"></div>
       <div className="flex pt-2">
         <div className='w-1/12 mr-2'>
           <img src='/createTweet.png' className='rounded-2xl' ></img>
         </div>
-        <textarea ref={textAreaRef} className="w-full h-24 outline-none"  value={TweetText} placeholder="What's happening?" onChange={handleTextChange}> </textarea>
+        <textarea ref={textAreaRef} className="w-full h-24 outline-none" value={TweetText} placeholder="What's happening?" onChange={handleTextChange}> </textarea>
       </div>
       <div className='flex'>
         <div className='w-1/12'></div>
@@ -110,13 +120,11 @@ useEffect(() => {
           <button onClick={handleTweet} className='text-blue-500 font-bold '>Tweet</button>
         </div>
       </div>
-
+      {/* { (() => { console.log(localStorage.getItem('email'), localStorage.getItem('password')); return null; })()} */}
     </div>
   );
 };
 
 export default CreateTweet;
-function dispatch(arg0: any) {
-  throw new Error('Function not implemented.');
-}
+
 

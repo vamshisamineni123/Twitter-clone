@@ -30,7 +30,7 @@ export class AppModule {
   constructor(private readonly databaseSetupService: DatabaseSetupService) {}
 
   async onModuleInit(): Promise<void> {
-    console.log('Creating tables...');
-    // await this.databaseSetupService.updateTables();
+     console.log('Creating tables...');
+    //  await this.databaseSetupService.createTables();
   }
 }

@@ -6,32 +6,35 @@ import Login from './pages/Login.page';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './store/index.slice';
 import { setRam } from './store/Postsreducer.slice';
+import { login } from './store/loginreducer.slice';
+import SignUp from './pages/Signup.page';
 
 const App: React.FC = () => {
   const dispatch = useDispatch();
-    const isLoggedIn = useSelector((state: RootState) => state.posts.ram);
-   const renderCount = useRef(0);
-
-   useEffect(() => {
-    renderCount.current = renderCount.current + 1;
-  });
+  const isLoggedIn = useSelector((state: RootState) => state.login.isAuthenticated);
+  const renderCount = useRef(0);
 
   useEffect(() => {
-      if(localStorage.getItem('user')==='true'){
-             dispatch(setRam(true));
+    renderCount.current = renderCount.current + 1;
+  });
+  useEffect(() => {
+    if (localStorage.getItem('isAuthenticated') === 'true') {
+      const email = localStorage.getItem('email');
+      const password = localStorage.getItem('password');
+      
+      if (email !== null && password !== null) {
+        dispatch(login({ email, password }));
       }
-  },[])
-  // localStorage.setItem('user', 'false');
-  const test=useSelector((state:RootState)=>state.posts.ram)
-  console.log(localStorage.getItem('user'));
-  console.log('ram  ',test)
-  // const isLoggedIn=localStorage.getItem('user')==='true'?true:false;
+    }
+  }, [])
+  
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={localStorage.getItem('user')==='true'? <Navigate to="/" /> : <Login  />} />
-        <Route path="/" element={localStorage.getItem('user')==='true' ? <Home /> : <Navigate to="/login" />} />
-        <Route path="/about" element={localStorage.getItem('user')==='true' ? <Profile /> : <Navigate to="/login" />} />
+        <Route path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+        <Route path="/signup" element={isLoggedIn ? <Navigate to="/" /> : <SignUp />} />
+        <Route path="/" element={isLoggedIn? <Home /> : <Navigate to="/login" />} />
+        <Route path="/about" element={isLoggedIn? <Profile /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

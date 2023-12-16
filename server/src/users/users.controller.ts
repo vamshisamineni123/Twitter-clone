@@ -87,6 +87,18 @@ getUserById(@Param('userid') userid:string): Promise<User> {
     return user;
 }
 
+  @Get('/email/:email')
+  async getUserByEmail(@Param('email') email:string): Promise<User> {
+   
+    const user=await this.userService.getUserByEmail(email);
+    // console.log(user);
+    if(!user) {
+      throw new Error(`User with email ${email} does not exist`);
+    }
+    else
+    return user;
+  }
+
   @Post('/')     // to get all the posts displayed
   postUser(@Body() body): Promise<User> {
     const user=this.userService.createUser(body);
@@ -118,14 +130,14 @@ getUserById(@Param('userid') userid:string): Promise<User> {
 //   UpdateUser(@Param() param, @Body() body): string {
 //       return 'user updated';
 //   }
-//   @Post('/:followerId/follow/:followeeId')
-// async followUser(
-//   @Param('followerId') followerId: string,
-//   @Param('followeeId') followeeId: string,
-// ): Promise<UserFollowing> {
-//   const userFollowing = await this.userService.createFollowing(followerId, followeeId);
-//   return userFollowing;
-// }
+  @Post('/:followerId/follow/:followeeId')
+async followUser(
+  @Param('followerId') followerId: string,
+  @Param('followeeId') followeeId: string,
+): Promise<void> {
+  const userFollowing = await this.userService.createFollowing(followerId, followeeId);
+  return userFollowing;
+}
   // the below has to be fixed
   // @Delete('/:followerId/follow/:followeeId')
   // unfollowUser(@Param('followerId') followerId:string,
@@ -135,11 +147,26 @@ getUserById(@Param('userid') userid:string): Promise<User> {
   //   return temp;
   //   //  return 'user unfollowed';
   // }
-  // @Get('/:userid/followers')
-  // async getFollowers(@Param('userid') userid: string): Promise<User[]> {
-  //   const followers = await this.userService.getFollowers(userid);
-  //   return followers;
-  // }
+  @Get('/:userid/followers')
+  async getFollowers(@Param('userid') userid: string): Promise<User[]> {
+    const followers = await this.userService.getFollowers(userid);
+    return followers;
+  }
+
+  @Delete('/:followerId/unfollow/:followeeId')
+  async unfollowUser(
+    @Param('followerId') followerId: string,
+    @Param('followeeId') followeeId: string,
+  ): Promise<void> {
+    const userFollowing = await this.userService.unfollowUser(followerId, followeeId);
+    return userFollowing;
+  }
+  //people you are following
+  @Get('/:userid/followees')
+  async getFollowees(@Param('userid') userid: string): Promise<User[]> {
+    const followees = await this.userService.getFollowees(userid);
+    return followees;
+  }
 
   // @Get('/:userid/following')
   // async getFollowing(@Param('userid') userid:string):  Promise<User[]> {

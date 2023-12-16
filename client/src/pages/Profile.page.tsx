@@ -9,36 +9,37 @@ import { setPosts } from '../store/Postsreducer.slice';
 import Header2 from '../components/Header2.component';
 import FollowBar from '../components/FollowBar/FollowBar.component';
 import Header1 from '../components/Header1.component';
-const MyComponent = () => {
+import userId from '../hooks/userId.hook'
 
+const MyComponent = () => {
   const dispatch = useDispatch();
   const posts = useSelector((state: RootState) => state.posts.posts)
-  useEffect(() => {
-    fetch(`http://localhost:3002/posts/`)
-      .then(response => response.json())
-      .then(data => {
-        dispatch(setPosts(data));
-      });
-  }, []);
+  const email = localStorage.getItem('email');
+  const user = userId(email === null ? '' : email);
+  const id = user?.id;
+  const userPosts = posts.filter(post => post.author_id === id);
+
   return (
     <div className='bg-bgtextcolor'>
       <div className='w-full h-30 bg-red-600'>
         <img className='' src='https://via.placeholder.com/150' />
       </div>
       <div className='flex'>
-        <div className='w-1/3'><SideBar /></div>
-        <div className='col-span-3'>
+        <div className='w-1/3 sticky top-0 h-screen'><SideBar /></div>
+        <div className='col-span-3 overflow-y-auto h-screen'>
           {
-            posts.map((post, index) => (
-              <div>
-                <Tweet key={post.id} post={post} />
+            userPosts.map((post, index) => (
+              <div key={post.id}>
+                <Tweet post={post} />
               </div>
             ))
           }
+
+          {/* <MiddleBar/> */}
         </div>
-        <div>
-          <div><Header2/></div>
-          <div><FollowBar/></div>
+        <div className='sticky top-0 h-screen'>
+          <div><Header2 /></div>
+          <div><FollowBar /></div>
         </div>
       </div>
     </div>
