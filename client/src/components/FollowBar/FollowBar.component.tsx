@@ -13,37 +13,39 @@ const FollowBar: React.FC<{}> = () => {
   // const [allUsers, setAllUsers] = useState<User[]>([]);
   const email = localStorage.getItem('email');
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [id, setId] = useState<string | null>(null);
+  // const [user, setUser] = useState<User | null>(null);
+  // const [id, setId] = useState<string | null>(null);
   const [follows, setFollows] = useState<{ follower_id: string, followee_id: string }[]>([]);
   const [followees, setFollowees] = useState<string[] | null>(null);
   const allUsers = useUsers();
-  useEffect(() => {
 
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(`http://localhost:3002/users/email/${email === null ? '' : email}`);
-        const data = await response.json();
-        setUser(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const user=userId(email === null ? '' : email);
+  const id=user?.id;
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     try {
+  //       const response = await fetch(`http://localhost:3002/users/email/${email === null ? '' : email}`);
+  //       const data = await response.json();
+  //       setUser(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
 
-    fetchUser();
-  }, [email]);
+  //   fetchUser();
+  // }, [email]);
 
-  useEffect(() => {
-    if (user) {
-      setId(user.id);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     setId(user.id);
+  //   }
+  // }, [user]);
   useEffect(() => {
     const fetchFollows = async () => {
       const data = await getFollowers(id);
       const data1=await getFollowees(id);
       setFollows(data1);
-      console.log('this is data in followbar component', data1)
+       console.log('this is data in followbar component', data1)
 
       const followerIds = data.map((follow: any) => follow.follower_id);
       setFollowees(followerIds);
@@ -52,7 +54,7 @@ const FollowBar: React.FC<{}> = () => {
     if (id) {
       fetchFollows();
     }
-  }, [id,follows]);
+  }, [id,follows, followees]);
   const handleClick = () => {
     navigate('/about');
   };

@@ -62,7 +62,7 @@ const SideBar = () => {
                     ))} 
                     <button onClick={handleLogOut}><SidebarItem onClick={() => {}} icon={BiLogOut} label="Logout" /></button>
         
-                    <button><SidebarTweetButton /></button>
+                    {/* <button><SidebarTweetButton /></button> */}
                 </div>
             </div>
         </div>
